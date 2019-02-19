@@ -9,10 +9,9 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox,QDesktopWidget
 import sqlite3
-from PyQt5.QtGui import QFont,QIcon
-import string
+from PyQt5.QtGui import QIcon
 
-class Ui_Form(object):
+class Ui_Form2(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(1800, 900)
@@ -79,7 +78,7 @@ class Ui_Form(object):
         self.graphicsView.setPixmap(QtGui.QPixmap('icon/micon.jpg'))
         self.pushButton.setText(_translate("Form", "查看"))
         self.label_3.setText(_translate("Form", "产品管理"))
-        self.label_4.setText(_translate("Form", "客户："+guestName))
+        self.label_4.setText(_translate("Form", "客户："+guestName[1:-1]))
         #item = self.tableWidget.verticalHeaderItem(0)
         #item.setText(_translate("Form", "New Row"))
         item = self.tableWidget.horizontalHeaderItem(0)
@@ -116,9 +115,9 @@ class Ui_Form(object):
         self.move(qr.topLeft())
 
     def showproduct(self):
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect('data/database.db')
         c = conn.cursor()
-        cursor = c.execute("SELECT COUNT(PNAME) FROM   PRODUCT WHERE GNAME=$guestName")
+        cursor = c.execute("SELECT COUNT(PNAME) FROM   PRODUCT WHERE GNAME="+guestName)
         if(cursor):
             for row in cursor:
                 self.tableWidget.setRowCount(row[0])
@@ -144,9 +143,9 @@ class Ui_Form(object):
         self.refreshByDB()
 
     def refreshByDB(self):
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect('data/database.db')
         c = conn.cursor()
-        cursor = c.execute("SELECT *  FROM PRODUCT WHERE GNAME=$guestName")
+        cursor = c.execute("SELECT *  FROM PRODUCT WHERE GNAME="+guestName)
         if(cursor):
             i = 0
             for row in cursor:
@@ -163,13 +162,13 @@ class Ui_Form(object):
         product  =  "'"+self.lineEdit.text()+ "'"
         size=  "'"+self.lineEdit1.text()+"'"
         number=  "'"+self.lineEdit2.text()+"'"
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect('data/database.db')
         c = conn.cursor()
         if(op=="delete"):
-            cursor = c.execute("SELECT * FROM PRODUCT WHERE GNAME=$guestName AND PNAME=$product")
+            cursor = c.execute("SELECT * FROM PRODUCT WHERE GNAME="+guestName+" AND PNAME="+ product)
             row = [r for r in cursor]
             if (len(row) > 0):
-                c.execute("DELETE FROM PRODUCT WHERE GNAME=$guestName AND PNAME=$product")
+                c.execute("DELETE FROM PRODUCT WHERE GNAME="+guestName+" AND PNAME="+ product)
                 reply = QMessageBox.information(self,  # 使用infomation信息框
                                                 "通知",
                                                 "删除成功！")
@@ -178,7 +177,7 @@ class Ui_Form(object):
                                                 "警告！",
                                                 "查找不到该产品！请确认您的输入是否正确：）")
         elif(op=="add"):
-            cursor = c.execute("SELECT * FROM PRODUCT WHERE GNAME=$guestName AND PNAME=$product")
+            cursor = c.execute("SELECT * FROM PRODUCT WHERE GNAME="+guestName+" AND PNAME="+ product)
             row = [r for r in cursor]
             if (len(row) == 0):
                 c.execute("INSERT INTO PRODUCT (GNAME,PNAME,SIZE,NUMBER) \
@@ -192,7 +191,7 @@ class Ui_Form(object):
                                                 "警告！",
                                                 "该产品已存在！请确认您的输入是否正确：）")
         elif(op=="refresh"):
-            cursor = c.execute("SELECT * FROM PRODUCT WHERE GNAME=$guestName AND PNAME=$product")
+            cursor = c.execute("SELECT * FROM PRODUCT WHERE GNAME="+guestName+" AND PNAME="+ product)
             row = [r for r in cursor]
             if (len(row) > 0):
                 if (len(size) == 2): size = "'" + row[0][1] + "'"
@@ -215,11 +214,14 @@ class Ui_Form(object):
         self.refreshByDB()
 
     def gotoitem(self,name):
-        print(name)
+        import os
+        iconpath = "\guest"
+        a = os.getcwd() + iconpath
+        os.startfile(str(a))
 
 
 
-class mywindow(QtWidgets.QWidget,Ui_Form):      #实例化窗口
+class mywindow(QtWidgets.QWidget,Ui_Form2):      #实例化窗口
     def __init__(self):
         super(mywindow,self).__init__()
         self.setupUi(self)                      #绘制界面
@@ -231,7 +233,7 @@ class mywindow(QtWidgets.QWidget,Ui_Form):      #实例化窗口
 
 if __name__=="__main__":    #文件主函数入口
     import sys
-    guestName='asfa' #sys.argv[1]
+    guestName="'"+sys.argv[1]+"'"
     app=QtWidgets.QApplication(sys.argv)
     myshow = mywindow()
     myshow.show()

@@ -5,14 +5,25 @@
 # Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox,QDesktopWidget
 import sqlite3
-from PyQt5.QtGui import QFont,QIcon
-import os
+from PyQt5.QtGui import QIcon
 
-class Ui_Form(object):
+
+
+
+
+
+
+class mywindow(QtWidgets.QWidget):      #实例化窗口
+    def __init__(self):
+        super(mywindow,self).__init__()
+        self.setupUi(self)                      #绘制界面
+        #对事件和响应函数建立连接
+        self.pushButton_2.clicked.connect(lambda: self.guest_operation("delete"))
+        self.pushButton_3.clicked.connect(lambda: self.guest_operation("add"))
+        self.pushButton_4.clicked.connect(lambda: self.guest_operation("refresh"))
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(1800, 900)
@@ -113,7 +124,7 @@ class Ui_Form(object):
         self.move(qr.topLeft())
 
     def showguest(self):
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect('data/database.db')
         c = conn.cursor()
         cursor = c.execute("SELECT COUNT(NAME) FROM   GUEST")
         if(cursor):
@@ -143,7 +154,7 @@ class Ui_Form(object):
         self.refreshByDB()
 
     def refreshByDB(self):
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect('data/database.db')
         c = conn.cursor()
         cursor = c.execute("SELECT *  FROM GUEST")
         if(cursor):
@@ -166,7 +177,7 @@ class Ui_Form(object):
 
 
 
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect('data/database.db')
         c = conn.cursor()
         if(op=="delete"):
             cursor = c.execute("SELECT * FROM GUEST WHERE NAME=" + guest)
@@ -219,17 +230,19 @@ class Ui_Form(object):
         self.refreshByDB()
 
     def gotoitem(self,name):
+
         import subprocess
         ps = subprocess.Popen(r"python product.py "+str(name));  # 执行cmd命令
 
-class mywindow(QtWidgets.QWidget,Ui_Form):      #实例化窗口
-    def __init__(self):
-        super(mywindow,self).__init__()
-        self.setupUi(self)                      #绘制界面
-        #对事件和响应函数建立连接
-        self.pushButton_2.clicked.connect(lambda: self.guest_operation("delete"))
-        self.pushButton_3.clicked.connect(lambda: self.guest_operation("add"))
-        self.pushButton_4.clicked.connect(lambda: self.guest_operation("refresh"))
+
+
+
+
+
+
+
+
+
 
 
 if __name__=="__main__":    #文件主函数入口
